@@ -15,15 +15,20 @@ import helmet from "helmet";
 // it log every API request on console
 import morgan from "morgan";
 
+import authRoutes from './routes/auth.routes';
+import { errorHandler } from './middleware/error.middleware';
+
 // read env file and load all variables in process.env
 dotenv.config();
 
 // create express app instance
 const app = express();
 
+                 // Middleware
 // parse json body of incoming request and convert it into js object
 // without it, req.body is undefined
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(cors());
 
@@ -34,11 +39,14 @@ app.use(helmet());
 // it shows METHODS, url, status codes, response time and size of every request on cnsole 
 app.use(morgan('dev'));
 
-app.get('/', (req, res) => {
-res.json({
-    success: true,
-    message: 'Online Bookstore API is working with TypeScript!',
-  });
+
+                          // Routes 
+// authRoute                          
+app.use('/api/auth', authRoutes);
+
+// Health check
+app.get('/health', (req, res) => {
+    res.json({ status: 'OK', message: 'Server is running' });
 });
 
 // Database Test Route 
@@ -60,8 +68,20 @@ app.get('/test-db', async (req, res) => {
   }
 });
 
+// 404 handler - if no route found
+app.use((req, res) => {
+    res.status(404).json({
+        success: false,
+        error: 'Route not found'
+    });
+});
+
+// Error handler - at last 
+app.use(errorHandler);  // Global error handler
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-  console.log(`TypeScript + PostgreSQL + Raw SQL`);
+    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Health: http://localhost:${PORT}/health`);
+    console.log(`Auth: http://localhost:${PORT}/api/auth`);
 });
