@@ -7,6 +7,9 @@ const router = Router();
 const authController = new AuthController();
 
 // User registration route
-router.post('/register', authController.register);
+router.post('/register', authController.register.bind(authController));
+
+// User login route
+router.post('/login', authController.login.bind(authController));
 
 export default router;

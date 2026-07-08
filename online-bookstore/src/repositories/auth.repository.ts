@@ -1,5 +1,6 @@
 import pool from '../config/database';
-import { User, RegisterUserDTO } from '../types/auth.types';
+import { RegisterUserDTO } from '../types/auth.types';
+import { User } from '../types/user.types';  
 
 export class AuthRepository {  
     // find user by email
@@ -21,4 +22,5 @@ export class AuthRepository {
         );
         return result.rows[0] as User;
     }
+
 }

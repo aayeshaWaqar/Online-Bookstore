@@ -1,4 +1,6 @@
 // input type for user registration
+import { User, UserWithoutPassword } from './user.types';
+
 export interface RegisterUserDTO {
  name: string;
  email: string;
@@ -7,24 +9,18 @@ export interface RegisterUserDTO {
  phone?: string;
 }
 
-// User response type (hide password)
-export interface UserResponse {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-    created_at: Date;
-}
-
-// user saved in database like this
-export interface User {
-    id: number;
-    name: string;
+// User login input type
+export interface LoginUserDTO {
     email: string;
     password: string;
-    role: string;
-    address?: string;
-    phone?: string;
-    created_at: Date;
-    updated_at: Date;
 }
+
+// Auth response type
+export interface AuthResponse {
+    token: string;
+    user: UserWithoutPassword;
+}
+
+// Re-export User types for convenience
+export type { User, UserWithoutPassword };
+

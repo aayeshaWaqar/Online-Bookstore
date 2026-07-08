@@ -16,6 +16,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 
 import authRoutes from './routes/auth.routes';
+import userRoutes from './routes/user.routes'; 
 import { errorHandler } from './middleware/error.middleware';
 
 // read env file and load all variables in process.env
@@ -43,6 +44,8 @@ app.use(morgan('dev'));
                           // Routes 
 // authRoute                          
 app.use('/api/auth', authRoutes);
+// userRoute
+app.use('/api/user', userRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -84,4 +87,5 @@ app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
     console.log(`Health: http://localhost:${PORT}/health`);
     console.log(`Auth: http://localhost:${PORT}/api/auth`);
+    console.log(`User: http://localhost:${PORT}/api/user`);
 });
