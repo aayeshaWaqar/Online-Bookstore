@@ -17,6 +17,7 @@ import morgan from "morgan";
 
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes'; 
+import bookRoutes from './routes/book.routes';
 import { errorHandler } from './middleware/error.middleware';
 
 // read env file and load all variables in process.env
@@ -46,6 +47,8 @@ app.use(morgan('dev'));
 app.use('/api/auth', authRoutes);
 // userRoute
 app.use('/api/user', userRoutes);
+// bookRoute
+app.use('/api/books', bookRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -88,4 +91,5 @@ app.listen(PORT, () => {
     console.log(`Health: http://localhost:${PORT}/health`);
     console.log(`Auth: http://localhost:${PORT}/api/auth`);
     console.log(`User: http://localhost:${PORT}/api/user`);
+    console.log(`Books: http://localhost:${PORT}/api/books`); 
 });
