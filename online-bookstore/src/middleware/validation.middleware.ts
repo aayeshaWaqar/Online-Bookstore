@@ -30,3 +30,70 @@ export const validatePagination = (req: Request, res: Response, next: NextFuncti
 
     next();
 };
+
+// 2. BOOK VALIDATION 
+export const validateBook = (req: Request, res: Response, next: NextFunction): void => {
+    const { title, author, price, stock, isbn, published_year } = req.body;
+
+    // Title validation
+    if (!title || title.trim().length < 2) {
+        res.status(400).json({
+            success: false,
+            error: 'Title must be at least 2 characters long'
+        });
+        return;
+    }
+
+    // Author validation
+    if (!author || author.trim().length < 2) {
+        res.status(400).json({
+            success: false,
+            error: 'Author must be at least 2 characters long'
+        });
+        return;
+    }
+
+    // Price validation
+    if (price === undefined || price <= 0) {
+        res.status(400).json({
+            success: false,
+            error: 'Price must be greater than 0'
+        });
+        return;
+    }
+
+    // Stock validation
+    if (stock === undefined || stock < 0) {
+        res.status(400).json({
+            success: false,
+            error: 'Stock must be 0 or greater'
+        });
+        return;
+    }
+
+    // ISBN validation (optional but if provided, validate format)
+    if (isbn) {
+        const isbnClean = isbn.replace(/-/g, '');
+        if (!/^\d{10}$|^\d{13}$/.test(isbnClean)) {
+            res.status(400).json({
+                success: false,
+                error: 'ISBN must be 10 or 13 digits'
+            });
+            return;
+        }
+    }
+
+    // Published year validation (optional but if provided, validate range)
+    if (published_year) {
+        const currentYear = new Date().getFullYear();
+        if (published_year < 1000 || published_year > currentYear) {
+            res.status(400).json({
+                success: false,
+                error: `Published year must be between 1000 and ${currentYear}`
+            });
+            return;
+        }
+    }
+
+     next();
+};

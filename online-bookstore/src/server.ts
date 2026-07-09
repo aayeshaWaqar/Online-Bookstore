@@ -19,6 +19,7 @@ import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes'; 
 import bookRoutes from './routes/book.routes';
 import { errorHandler } from './middleware/error.middleware';
+import './config/database';
 
 // read env file and load all variables in process.env
 dotenv.config();

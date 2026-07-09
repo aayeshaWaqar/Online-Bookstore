@@ -27,8 +27,40 @@ export interface PaginatedBooksResponse {
     };
 }
 
-// Query params for pagination
+// BOOK QUERY PARAMS - For GET All Books
 export interface BookQueryParams {
-    page?: number;    // Default: 1
-    limit?: number;   // Default: 10
+    page?: number;    // OPTIONAL - Page number (default: 1)
+    limit?: number;   // OPTIONAL - Books per page (default: 10, max: 100)
 }
+
+// BOOK RESPONSE - For Single Book Operations
+export interface BookResponse {
+    success: boolean;
+    message?: string;
+    data?: {
+        book: Book;
+    };
+}
+
+
+// 2. CREATE BOOK DTO - For Admin to Add New Book
+export interface CreateBookDTO {
+    title: string;             // REQUIRED - Book title
+    author: string;            // REQUIRED - Author name
+    description?: string;      // OPTIONAL - Book description
+    price: number;             // REQUIRED - Price (must be > 0)
+    stock: number;             // REQUIRED - Stock quantity (must be >= 0)
+    category_id?: number;      // OPTIONAL - Category ID (references categories table)
+    image_url?: string;        // OPTIONAL - Book cover image URL
+    isbn?: string;             // OPTIONAL - ISBN number (should be unique)
+    published_year?: number;   // OPTIONAL - Year of publication
+}
+
+// 3. UPDATE BOOK DTO - For Admin to Edit Book
+// Partial<CreateBookDTO> means all fields are optional
+export interface UpdateBookDTO extends Partial<CreateBookDTO> {
+    // All fields from CreateBookDTO are optional here
+    // Admin can update any field partially
+}
+
+
