@@ -35,7 +35,8 @@ export const validatePagination = (req: Request, res: Response, next: NextFuncti
 export const validateBook = (req: Request, res: Response, next: NextFunction): void => {
     const { title, author, price, stock, isbn, published_year } = req.body;
 
-    // Title validation
+    // Title validation - Only if provided (for update) OR required (for create)
+    if (title !== undefined) {
     if (!title || title.trim().length < 2) {
         res.status(400).json({
             success: false,
@@ -43,8 +44,10 @@ export const validateBook = (req: Request, res: Response, next: NextFunction): v
         });
         return;
     }
+    }
 
-    // Author validation
+    // Author validation - only if provided (for update) OR required (for create)
+    if (author !== undefined) {
     if (!author || author.trim().length < 2) {
         res.status(400).json({
             success: false,
@@ -52,27 +55,32 @@ export const validateBook = (req: Request, res: Response, next: NextFunction): v
         });
         return;
     }
+    }
 
-    // Price validation
-    if (price === undefined || price <= 0) {
+    // Price validation - only if provided (for update) OR required (for create)
+    if (price !== undefined) {
+    if ( price <= 0) {
         res.status(400).json({
             success: false,
             error: 'Price must be greater than 0'
         });
         return;
     }
+    }
 
-    // Stock validation
-    if (stock === undefined || stock < 0) {
+    // Stock validation - only if provided (for update) OR required (for create)
+    if (stock !== undefined) {
+    if ( stock < 0) {
         res.status(400).json({
             success: false,
             error: 'Stock must be 0 or greater'
         });
         return;
     }
+}
 
-    // ISBN validation (optional but if provided, validate format)
-    if (isbn) {
+    // ISBN validation - only if provided (for update) OR required (for create)
+    if (isbn !== undefined && isbn !== '') {
         const isbnClean = isbn.replace(/-/g, '');
         if (!/^\d{10}$|^\d{13}$/.test(isbnClean)) {
             res.status(400).json({
@@ -83,8 +91,8 @@ export const validateBook = (req: Request, res: Response, next: NextFunction): v
         }
     }
 
-    // Published year validation (optional but if provided, validate range)
-    if (published_year) {
+    // Published year validation (optional but if provided (for update) OR required (for create))
+    if (published_year !== undefined && published_year !== '') {
         const currentYear = new Date().getFullYear();
         if (published_year < 1000 || published_year > currentYear) {
             res.status(400).json({
@@ -96,4 +104,27 @@ export const validateBook = (req: Request, res: Response, next: NextFunction): v
     }
 
      next();
+};
+
+// ID VALIDATION 
+/**
+ * Validate ID parameter
+ * Checks if ID is a valid positive number
+ */
+export const validateId = (req: Request, res: Response, next: NextFunction): void => {
+    // Type assertion to string
+    const id = parseInt(req.params.id as string);
+    
+    if (isNaN(id) || id < 1) {
+        res.status(400).json({
+            success: false,
+            error: 'Invalid ID. ID must be a positive number'
+        });
+        return;
+    }
+
+    // Store validated ID for controller use
+    (req as any).validatedId = id;
+    
+    next();
 };

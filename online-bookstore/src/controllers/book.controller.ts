@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { BookService } from '../services/book.service';
-import { CreateBookDTO } from '../types/book.types';
+import { CreateBookDTO, UpdateBookDTO } from '../types/book.types';
 
 const bookService = new BookService();
 
@@ -58,4 +58,44 @@ export class BookController {
             next(error);
         }
     }
+
+    // get book by ID
+    async getBookById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+        const id = parseInt(req.params.id as string); 
+        const book = await bookService.getBookById(id);
+        
+        res.json({
+            success: true,
+            data: { book }
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+    
+    // Update Book
+    async updateBook(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            // Validation already done by middleware
+            // ID already validated by validateId middleware
+            const id = parseInt(req.params.id as string);
+            const updateData: UpdateBookDTO = req.body;
+
+            // Call service
+            const book = await bookService.updateBook(id, updateData);
+
+            // Send response
+            res.json({
+                success: true,
+                message: 'Book updated successfully',
+                data: { book }
+            });
+        } catch (error) {
+            // Pass error to global error handler
+            next(error);
+        }
+    }
+
+
 }

@@ -1,5 +1,5 @@
 import pool from '../config/database';
-import { Book, CreateBookDTO } from '../types/book.types';
+import { Book, CreateBookDTO, UpdateBookDTO } from '../types/book.types';
 
 export class BookRepository {
     
@@ -84,4 +84,50 @@ export class BookRepository {
 
         return result.rows[0] as Book;
     }
+
+
+    // 3. find book by ID
+async findById(id: number): Promise<Book | null> {
+    const result = await pool.query(
+        'SELECT * FROM books WHERE id = $1 AND is_active = true',
+        [id]
+    );
+    return (result.rows[0] as Book) || null;
+}
+
+    // 4. Update Book
+ async update(id: number, data: UpdateBookDTO): Promise<Book | null> {
+        // Build dynamic update query
+        const fields: string[] = [];
+        const values: any[] = [];
+        let paramCount = 1;
+
+        const allowedFields = [
+            'title', 'author', 'description', 'price', 'stock',
+            'category_id', 'image_url', 'isbn', 'published_year'
+        ];
+
+        // Only include fields that are provided
+        for (const [key, value] of Object.entries(data)) {
+            if (allowedFields.includes(key) && value !== undefined) {
+                fields.push(`${key} = $${paramCount}`);
+                values.push(value);
+                paramCount++;
+            }
+        }
+
+        fields.push(`updated_at = CURRENT_TIMESTAMP`);
+        values.push(id);
+
+        const query = `
+            UPDATE books 
+            SET ${fields.join(', ')} 
+            WHERE id = $${paramCount} AND is_active = true
+            RETURNING *
+        `;
+
+        const result = await pool.query(query, values);
+        return (result.rows[0] as Book) || null;  // Return null if not found
+    }
+
 }
