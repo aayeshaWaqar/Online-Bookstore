@@ -3,36 +3,65 @@ import { Book, CreateBookDTO, UpdateBookDTO } from '../types/book.types';
 
 export class BookRepository {
     
-    // 1. GET ALL BOOKS - With Pagination 
-    /**
-     * Fetch all active books with pagination
-     * @param page - Page number (default: 1)
-     * @param limit - Books per page (default: 10)
-     * @returns Object containing books array and total count
-     */
-    async findAll(page: number = 1, limit: number = 10): Promise<{ books: Book[]; total: number }> {
+    // 1. GET ALL BOOKS 
+   
+    async findAll(page: number = 1, limit: number = 10, search?: string, minPrice?: number, maxPrice?: number, author?: string): Promise<{ books: Book[]; total: number }> {
         // Calculate offset for pagination
         const offset = (page - 1) * limit;
 
+        let query = 'SELECT * FROM books WHERE is_active = true';
         // Get total count of active books
-        const countResult = await pool.query(
-            'SELECT COUNT(*) FROM books WHERE is_active = true'
-        );
-        const total = parseInt(countResult.rows[0].count);
+        let countQuery = 'SELECT COUNT(*) FROM books WHERE is_active = true';
+        const values: any[] = [];
+        let paramCount = 1;
 
-        // Get paginated books
-        const result = await pool.query(
-            `SELECT * FROM books 
-             WHERE is_active = true 
-             ORDER BY created_at DESC 
-             LIMIT $1 OFFSET $2`,
-            [limit, offset]
-        );
+        // Add search condition
+    if (search) {
+        const searchTerm = `%${search}%`;
+        query += ` AND (title ILIKE $${paramCount} OR author ILIKE $${paramCount})`;
+        countQuery += ` AND (title ILIKE $${paramCount} OR author ILIKE $${paramCount})`;
+        values.push(searchTerm);
+        paramCount++;
+    }
 
-        return {
-            books: result.rows as Book[],
-            total
-        };
+        // Price Range Filter
+    if (minPrice !== undefined) {
+            query += ` AND price >= $${paramCount}`;
+            countQuery += ` AND price >= $${paramCount}`;
+            values.push(minPrice);
+            paramCount++;
+        }
+
+    if (maxPrice !== undefined) {
+            query += ` AND price <= $${paramCount}`;
+            countQuery += ` AND price <= $${paramCount}`;
+            values.push(maxPrice);
+            paramCount++;
+        }
+
+         // Author Filter
+    if (author) {
+            const authorTerm = `%${author}%`;
+            query += ` AND author ILIKE $${paramCount}`;
+            countQuery += ` AND author ILIKE $${paramCount}`;
+            values.push(authorTerm);
+            paramCount++;
+        }
+
+        // Add pagination
+    query += ` ORDER BY created_at DESC LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
+    values.push(limit, offset);
+
+        // Execute queries
+    const countResult = await pool.query(countQuery, values.slice(0, values.length - 2));
+    const total = parseInt(countResult.rows[0].count);
+       
+
+        const result = await pool.query(query, values);
+    return {
+        books: result.rows as Book[],
+        total
+    };
     }
 
     // 2. CREATE BOOK - Admin Add New Book 
@@ -129,5 +158,24 @@ async findById(id: number): Promise<Book | null> {
         const result = await pool.query(query, values);
         return (result.rows[0] as Book) || null;  // Return null if not found
     }
+
+    // 5. DELETE BOOK - Soft Delete 
+    /**
+     * Soft delete a book (set is_active = false)
+     * @param id - Book ID to delete
+     * @returns Deleted book or null if not found
+     */
+    async delete(id: number): Promise<Book | null> {
+        const result = await pool.query(
+            `UPDATE books 
+             SET is_active = false, 
+                 deleted_at = CURRENT_TIMESTAMP 
+             WHERE id = $1 AND is_active = true 
+             RETURNING *`,
+            [id]
+        );
+        return (result.rows[0] as Book) || null;
+
+}
 
 }

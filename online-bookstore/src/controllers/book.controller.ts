@@ -17,9 +17,13 @@ export class BookController {
             // Extract and parse query parameters
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 10;
+            const search = req.query.search as string;
+            const minPrice = req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined;
+            const maxPrice = req.query.maxPrice ? parseFloat(req.query.maxPrice as string) : undefined;
+            const author = req.query.author as string;
 
             // Call service to get books
-            const result = await bookService.getAllBooks({ page, limit });
+            const result = await bookService.getAllBooks({ page, limit, search, minPrice, maxPrice, author });
 
             // Send success response
             res.json({
@@ -97,5 +101,25 @@ export class BookController {
         }
     }
 
+    // 5. DELETE BOOK - Soft Delete 
+    /**
+     * Soft delete a book (Admin only)
+     * @param req - Request with book ID in params
+     * @param res - Response
+     * @param next - Error handler
+     */
+    async deleteBook(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const id = parseInt(req.params.id as string);
+            
+            await bookService.deleteBook(id);
 
+            res.json({
+                success: true,
+                 message: 'Book deleted successfully'
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
 }

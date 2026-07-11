@@ -3,6 +3,74 @@ import { Request, Response, NextFunction } from 'express';
 export const validatePagination = (req: Request, res: Response, next: NextFunction): void => {
     const page = req.query.page;
     const limit = req.query.limit;
+    const search = req.query.search;  
+    const minPrice = req.query.minPrice;
+    const maxPrice = req.query.maxPrice;
+    const author = req.query.author;
+
+    // Min Price validation
+    if (minPrice !== undefined) {
+        const minPriceNum = parseFloat(minPrice as string);
+        if (isNaN(minPriceNum) || minPriceNum < 0) {
+            res.status(400).json({
+                success: false,
+                error: 'Min price must be a valid number greater than or equal to 0'
+            });
+            return;
+        }
+    }
+
+    // Max Price validation
+    if (maxPrice !== undefined) {
+        const maxPriceNum = parseFloat(maxPrice as string);
+        if (isNaN(maxPriceNum) || maxPriceNum <= 0) {
+            res.status(400).json({
+                success: false,
+                error: 'Max price must be a valid number greater than 0'
+            });
+            return;
+        }
+    }
+
+    // Min Price vs Max Price validation 
+    if (minPrice !== undefined && maxPrice !== undefined) {
+        const minPriceNum = parseFloat(minPrice as string);
+        const maxPriceNum = parseFloat(maxPrice as string);
+        if (minPriceNum > maxPriceNum) {
+            res.status(400).json({
+                success: false,
+                error: 'Min price cannot be greater than max price'
+            });
+            return;  // Stop execution
+        }
+    }
+
+    // Author validation
+    if (author !== undefined) {
+        const authorStr = author as string;
+        if (authorStr.trim().length < 2) {
+            res.status(400).json({
+                success: false,
+                error: 'Author must be at least 2 characters long'
+            });
+            return;
+        }
+    }
+
+
+
+    // Search validation (optional, min 2 chars if provided)
+    if (search !== undefined) {
+        const searchStr = search as string;
+        if (searchStr.trim().length < 2) {
+            res.status(400).json({
+                success: false,
+                error: 'Search term must be at least 2 characters long'
+            });
+            return;
+        }
+    }
+
 
     // Check page
     if (page !== undefined) {

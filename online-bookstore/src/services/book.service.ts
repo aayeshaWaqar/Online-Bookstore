@@ -14,9 +14,13 @@ export class BookService {
         // Set default values for pagination
         const page = Math.max(1, params.page || 1);
         const limit = Math.min(100, params.limit || 10);
+        const search = params.search?.trim() || undefined;
+         const minPrice = params.minPrice;
+        const maxPrice = params.maxPrice;
+        const author = params.author?.trim() || undefined;
         
         // Get data from repository
-        const { books, total } = await bookRepository.findAll(page, limit);
+        const { books, total } = await bookRepository.findAll(page, limit, search, minPrice, maxPrice, author);
         
         // Calculate total pages
         const totalPages = Math.ceil(total / limit);
@@ -94,4 +98,28 @@ export class BookService {
 
         return updatedBook;
     }    
+
+    // 5. DELETE BOOK - Soft Delete 
+    /**
+     * Soft delete a book (Admin only)
+     * @param id - Book ID to delete
+     * @throws Error if book not found
+     */
+    async deleteBook(id: number): Promise<void> {
+        // Check if book exists
+        const existingBook = await bookRepository.findById(id);
+        if (!existingBook) {
+            const error = new Error('Book not found');
+            (error as any).status = 404;
+            throw error;
+        }
+
+        // Soft delete book
+        const deletedBook = await bookRepository.delete(id);
+        if (!deletedBook) {
+            const error = new Error('Failed to delete book');
+            (error as any).status = 500;
+            throw error;
+        }
+    }
 }

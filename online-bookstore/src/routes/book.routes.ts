@@ -53,4 +53,13 @@ router.put(
     bookController.updateBook.bind(bookController)
 );     
 
+// DELETE /api/books/:id - Soft delete book (Admin only) 
+router.delete(
+    '/:id', 
+    authenticate, 
+    isAdmin, 
+    validateId, 
+    bookController.deleteBook.bind(bookController)
+);
+
 export default router;

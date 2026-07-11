@@ -31,6 +31,12 @@ export interface PaginatedBooksResponse {
 export interface BookQueryParams {
     page?: number;    // OPTIONAL - Page number (default: 1)
     limit?: number;   // OPTIONAL - Books per page (default: 10, max: 100)
+    search?: string;  // OPTIONAL - Search by title or author
+
+    // Filter fields (Only price and author)
+    minPrice?: number;    // OPTIONAL - Minimum price filter
+    maxPrice?: number;    // OPTIONAL - Maximum price filter
+    author?: string;      // OPTIONAL - Filter by author name
 }
 
 // BOOK RESPONSE - For Single Book Operations
