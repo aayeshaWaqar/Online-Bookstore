@@ -21,9 +21,10 @@ export class BookController {
             const minPrice = req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined;
             const maxPrice = req.query.maxPrice ? parseFloat(req.query.maxPrice as string) : undefined;
             const author = req.query.author as string;
+            const category = req.query.category ? parseInt(req.query.category as string) : undefined;
 
             // Call service to get books
-            const result = await bookService.getAllBooks({ page, limit, search, minPrice, maxPrice, author });
+            const result = await bookService.getAllBooks({ page, limit, search, minPrice, maxPrice, author, category });
 
             // Send success response
             res.json({

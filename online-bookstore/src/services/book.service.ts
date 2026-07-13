@@ -18,9 +18,10 @@ export class BookService {
          const minPrice = params.minPrice;
         const maxPrice = params.maxPrice;
         const author = params.author?.trim() || undefined;
+        const category = params.category;   
         
         // Get data from repository
-        const { books, total } = await bookRepository.findAll(page, limit, search, minPrice, maxPrice, author);
+        const { books, total } = await bookRepository.findAll(page, limit, search, minPrice, maxPrice, author, category);
         
         // Calculate total pages
         const totalPages = Math.ceil(total / limit);

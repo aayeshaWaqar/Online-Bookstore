@@ -5,7 +5,7 @@ export class BookRepository {
     
     // 1. GET ALL BOOKS 
    
-    async findAll(page: number = 1, limit: number = 10, search?: string, minPrice?: number, maxPrice?: number, author?: string): Promise<{ books: Book[]; total: number }> {
+    async findAll(page: number = 1, limit: number = 10, search?: string, minPrice?: number, maxPrice?: number, author?: string, category?: number): Promise<{ books: Book[]; total: number }> {
         // Calculate offset for pagination
         const offset = (page - 1) * limit;
 
@@ -23,6 +23,15 @@ export class BookRepository {
         values.push(searchTerm);
         paramCount++;
     }
+
+    // Category filter
+    if (category) {
+        query += ` AND category_id = $${paramCount}`;
+        countQuery += ` AND category_id = $${paramCount}`;
+        values.push(category);
+        paramCount++;
+    }
+
 
         // Price Range Filter
     if (minPrice !== undefined) {

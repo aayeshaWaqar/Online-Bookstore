@@ -37,6 +37,7 @@ export interface BookQueryParams {
     minPrice?: number;    // OPTIONAL - Minimum price filter
     maxPrice?: number;    // OPTIONAL - Maximum price filter
     author?: string;      // OPTIONAL - Filter by author name
+    category?: number;
 }
 
 // BOOK RESPONSE - For Single Book Operations

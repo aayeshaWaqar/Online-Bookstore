@@ -7,6 +7,7 @@ export const validatePagination = (req: Request, res: Response, next: NextFuncti
     const minPrice = req.query.minPrice;
     const maxPrice = req.query.maxPrice;
     const author = req.query.author;
+    const category = req.query.category;   
 
     // Min Price validation
     if (minPrice !== undefined) {
@@ -44,6 +45,19 @@ export const validatePagination = (req: Request, res: Response, next: NextFuncti
             return;  // Stop execution
         }
     }
+
+    // Category validation
+    if (category !== undefined) {
+        const categoryNum = parseInt(category as string);
+        if (isNaN(categoryNum) || categoryNum < 1) {
+            res.status(400).json({
+                success: false,
+                error: 'Category must be a positive number'
+            });
+            return;
+        }
+    }
+
 
     // Author validation
     if (author !== undefined) {
@@ -194,5 +208,43 @@ export const validateId = (req: Request, res: Response, next: NextFunction): voi
     // Store validated ID for controller use
     (req as any).validatedId = id;
     
+    next();
+};
+
+// CATEGORY VALIDATION 
+/**
+ * Validate category data for create and update
+ * Checks: name (required, min 2 chars)
+ */
+export const validateCategory = (req: Request, res: Response, next: NextFunction): void => {
+    const { name, description } = req.body;
+
+    // Name validation - Required, min 2 chars
+    if (!name || name.trim().length < 2) {
+        res.status(400).json({
+            success: false,
+            error: 'Category name must be at least 2 characters long'
+        });
+        return;
+    }
+
+    // Name validation - Max 100 chars (database limit)
+    if (name.trim().length > 100) {
+        res.status(400).json({
+            success: false,
+            error: 'Category name must be less than 100 characters'
+        });
+        return;
+    }
+
+    // Description validation - Optional, but if provided should be valid
+    if (description !== undefined && description.trim().length < 2) {
+        res.status(400).json({
+            success: false,
+            error: 'Description must be at least 2 characters long if provided'
+        });
+        return;
+    }
+
     next();
 };
