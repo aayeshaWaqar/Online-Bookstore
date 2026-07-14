@@ -27,4 +27,44 @@ export class CategoryController {
             next(error);
         }
     }
+
+    /**
+     * Get all categories
+     * @param req - Request
+     * @param res - Response
+     * @param next - Error handler
+     */
+    async getAllCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const categories = await categoryService.getAllCategories();
+
+            res.json({
+                success: true,
+                data: { categories }
+            });
+        } catch (error){
+            next(error);
+        }
+    }
+
+    // 3. GET CATEGORY BY ID 
+    /**
+     * Get a single category by ID
+     * @param req - Request with category ID in params
+     * @param res - Response
+     * @param next - Error handler
+     */
+    async getCategoryById(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const id = parseInt(req.params.id as string);
+            const category = await categoryService.getCategoryById(id);
+
+            res.json({
+                success: true,
+                data: { category }
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
 }

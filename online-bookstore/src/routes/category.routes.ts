@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { CategoryController } from '../controllers/category.controller';
 import { authenticate, isAdmin } from '../middleware/auth.middleware';
-import { validateCategory } from '../middleware/validation.middleware';
+import { validateCategory, validateId } from '../middleware/validation.middleware';
 
 const router = Router();
 const categoryController = new CategoryController();
@@ -20,5 +20,11 @@ router.post(
     validateCategory,
     categoryController.createCategory.bind(categoryController)
 );
+
+// GET /api/categories - Get all categories 
+router.get('/', categoryController.getAllCategories.bind(categoryController));
+
+// GET /api/categories/:id - Get category by ID 
+router.get('/:id', validateId, categoryController.getCategoryById.bind(categoryController));
 
 export default router;

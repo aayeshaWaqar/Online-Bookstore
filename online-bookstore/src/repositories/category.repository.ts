@@ -34,4 +34,22 @@ export class CategoryRepository {
 
         return result.rows[0] as Category;
     }
+
+    // ADD THIS METHOD - Get all categories
+async findAll(): Promise<Category[]> {
+    const result = await pool.query(
+        'SELECT * FROM categories ORDER BY name ASC'
+    );
+    return result.rows as Category[];
+}
+
+// ADD THIS METHOD - Get category by ID
+async findById(id: number): Promise<Category | null> {
+    const result = await pool.query(
+        'SELECT * FROM categories WHERE id = $1',
+        [id]
+    );
+    return (result.rows[0] as Category) || null;
+}
+
 }

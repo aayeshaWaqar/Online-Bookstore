@@ -23,4 +23,31 @@ export class CategoryService {
         const category = await categoryRepository.create(categoryData);
         return category;
     }
+
+    // 2. GET ALL CATEGORIES 
+    /**
+     * Get all categories
+     * @returns Array of categories sorted by name
+     */
+    async getAllCategories(): Promise<Category[]> {
+        const categories = await categoryRepository.findAll();
+        return categories;
+    }
+
+    // 3. GET CATEGORY BY ID 
+    /**
+     * Get a single category by its ID
+     * @param id - Category ID
+     * @returns Category object
+     * @throws Error if category not found
+     */
+    async getCategoryById(id: number): Promise<Category> {
+        const category = await categoryRepository.findById(id);
+        if (!category) {
+            const error = new Error('Category not found');
+            (error as any).status = 404;
+            throw error;
+        }
+        return category;
+    }
 }
