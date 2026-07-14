@@ -1,5 +1,5 @@
 import pool from '../config/database';
-import { Category, CreateCategoryDTO } from '../types/category.types';
+import { Category, CreateCategoryDTO, UpdateCategoryDTO } from '../types/category.types';
 
 export class CategoryRepository {
     // 1. FIND CATEGORY BY NAME - For Duplicate Check
@@ -50,6 +50,42 @@ async findById(id: number): Promise<Category | null> {
         [id]
     );
     return (result.rows[0] as Category) || null;
+}
+
+
+async update(id: number, data: UpdateCategoryDTO): Promise<Category | null> {
+    const fields: string[] = [];
+    const values: any[] = [];
+    let paramCount = 1;
+
+    const allowedFields = ['name', 'description'];
+    for (const [key, value] of Object.entries(data)) {
+        if (allowedFields.includes(key) && value !== undefined) {
+            fields.push(`${key} = $${paramCount}`);
+            values.push(value);
+            paramCount++;
+        }
+    }
+values.push(id);
+
+    const query = `
+        UPDATE categories 
+        SET ${fields.join(', ')} 
+        WHERE id = $${paramCount} 
+        RETURNING *
+    `;
+
+    const result = await pool.query(query, values);
+    return (result.rows[0] as Category) || null;
+}
+
+// Delete category
+async delete(id: number): Promise<boolean> {
+    const result = await pool.query(
+        'DELETE FROM categories WHERE id = $1 RETURNING id',
+        [id]
+    );
+    return (result.rowCount || 0) > 0;
 }
 
 }

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { CategoryService } from '../services/category.service';
-import { CreateCategoryDTO } from '../types/category.types';
+import { CreateCategoryDTO, UpdateCategoryDTO } from '../types/category.types';
 
 const categoryService = new CategoryService();
 
@@ -67,4 +67,51 @@ export class CategoryController {
             next(error);
         }
     }
+
+    // 4. UPDATE CATEGORY 
+    /**
+     * Update a category (Admin only)
+     * @param req - Request with category ID in params and data in body
+     * @param res - Response
+     * @param next - Error handler
+     */
+    async updateCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const id = parseInt(req.params.id as string);
+            const updateData: UpdateCategoryDTO = req.body;
+
+            const category = await categoryService.updateCategory(id, updateData);
+
+            res.json({
+                success: true,
+                 message: 'Category updated successfully',
+                data: { category }
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // 5. DELETE CATEGORY 
+    /**
+     * Delete a category (Admin only)
+     * @param req - Request with category ID in params
+     * @param res - Response
+     * @param next - Error handler
+     */
+    async deleteCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const id = parseInt(req.params.id as string);
+
+            await categoryService.deleteCategory(id);
+
+            res.json({
+                success: true,
+                message: 'Category deleted successfully'
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+    
 }

@@ -219,31 +219,36 @@ export const validateId = (req: Request, res: Response, next: NextFunction): voi
 export const validateCategory = (req: Request, res: Response, next: NextFunction): void => {
     const { name, description } = req.body;
 
-    // Name validation - Required, min 2 chars
-    if (!name || name.trim().length < 2) {
-        res.status(400).json({
-            success: false,
-            error: 'Category name must be at least 2 characters long'
-        });
-        return;
+    // Name validation - Only if provided
+    if (name !== undefined) {
+        const nameStr = String(name).trim(); // Safe string conversion
+        if (!nameStr || nameStr.length < 2) {
+            res.status(400).json({
+                success: false,
+                error: 'Category name must be at least 2 characters long'
+            });
+            return;
+        }
+
+    if (nameStr.length > 100) {
+            res.status(400).json({
+                success: false,
+                error: 'Category name must be less than 100 characters'
+            });
+            return;
+        }
     }
 
-    // Name validation - Max 100 chars (database limit)
-    if (name.trim().length > 100) {
-        res.status(400).json({
-            success: false,
-            error: 'Category name must be less than 100 characters'
-        });
-        return;
-    }
-
-    // Description validation - Optional, but if provided should be valid
-    if (description !== undefined && description.trim().length < 2) {
-        res.status(400).json({
-            success: false,
-            error: 'Description must be at least 2 characters long if provided'
-        });
-        return;
+     // Description validation - Only if provided
+    if (description !== undefined) {
+        const descStr = String(description).trim(); // Safe string conversion
+        if (descStr.length < 2) {
+            res.status(400).json({
+                success: false,
+                error: 'Description must be at least 2 characters long if provided'
+            });
+            return;
+        }
     }
 
     next();

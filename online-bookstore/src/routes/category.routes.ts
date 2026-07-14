@@ -27,4 +27,23 @@ router.get('/', categoryController.getAllCategories.bind(categoryController));
 // GET /api/categories/:id - Get category by ID 
 router.get('/:id', validateId, categoryController.getCategoryById.bind(categoryController));
 
+// PUT /api/categories/:id - Update category (Admin only) 
+router.put(
+    '/:id', 
+    authenticate, 
+    isAdmin, 
+    validateId, 
+    validateCategory, 
+    categoryController.updateCategory.bind(categoryController)
+);
+
+// DELETE /api/categories/:id - Delete category (Admin only) 
+router.delete(
+    '/:id', 
+    authenticate, 
+    isAdmin, 
+    validateId, 
+    categoryController.deleteCategory.bind(categoryController)
+);
+
 export default router;
