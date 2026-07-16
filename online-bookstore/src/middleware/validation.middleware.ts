@@ -253,3 +253,42 @@ export const validateCategory = (req: Request, res: Response, next: NextFunction
 
     next();
 };
+
+// 5. CART VALIDATION - ADD TO CART 
+/**
+ * Validate add to cart request
+ * Checks: book_id (required, positive number), quantity (optional, positive number)
+ */
+export const validateAddToCart = (req: Request, res: Response, next: NextFunction): void => {
+    const { book_id, quantity } = req.body;
+
+    // book_id validation - Required, positive number
+    if (!book_id) {
+        res.status(400).json({
+            success: false,
+            error: 'Book ID is required'
+        });
+        return;
+    }
+
+    if (isNaN(book_id) || book_id < 1) {
+        res.status(400).json({
+            success: false,
+            error: 'Book ID must be a positive number'
+        });
+        return;
+    }
+
+    // quantity validation - Optional, positive number (if provided)
+    if (quantity !== undefined) {
+        if (isNaN(quantity) || quantity < 1) {
+            res.status(400).json({
+                success: false,
+                error: 'Quantity must be a positive number (minimum 1)'
+            });
+            return;
+        }
+    }
+
+    next();
+};
