@@ -292,3 +292,56 @@ export const validateAddToCart = (req: Request, res: Response, next: NextFunctio
 
     next();
 };
+
+// 6. CART VALIDATION - UPDATE QUANTITY
+export const validateUpdateCartQuantity = (req: Request, res: Response, next: NextFunction): void => {
+    const bookId = parseInt(req.params.bookId as string);
+    const { quantity } = req.body;
+
+    if (isNaN(bookId) || bookId < 1) {
+        res.status(400).json({
+            success: false,
+            error: 'Book ID must be a positive number'
+        });
+        return;
+    }
+
+    if (quantity === undefined) {
+        res.status(400).json({
+            success: false,
+            error: 'Quantity is required'
+        });
+        return;
+    }
+
+    if (isNaN(quantity) || quantity < 1) {
+        res.status(400).json({
+            success: false,
+            error: 'Quantity must be a positive number (minimum 1)'
+        });
+        return;
+    }
+
+    (req as any).validatedBookId = bookId;
+
+    next();
+};
+
+// 7. CART VALIDATION - REMOVE ITEM
+/**
+ * Validate remove cart item request
+ * Checks: bookId param (required, positive number)
+ */
+export const validateCartBookId = (req: Request, res: Response, next: NextFunction): void => {
+    const bookId = parseInt(req.params.bookId as string);
+
+    if (isNaN(bookId) || bookId < 1) {
+        res.status(400).json({
+            success: false,
+            error: 'Book ID must be a positive number'
+        });
+        return;
+    }
+
+    next();
+};

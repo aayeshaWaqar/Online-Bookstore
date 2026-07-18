@@ -92,4 +92,75 @@ export class CartService {
             total_price: totalPrice
         };
     }
+
+    // 3. UPDATE QUANTITY
+    /**
+     * Update quantity of a book already in user's cart
+     * @param userId - User ID
+     * @param bookId - Book ID
+     * @param quantity - New quantity
+     * @returns Updated cart item
+     * @throws Error if item not in cart or stock insufficient
+     */
+
+    async updateCartQuantity(userId: number, bookId: number, quantity: number): Promise<CartItem> {
+        // Check if item exists in cart
+        const existingItem = await cartRepository.findCartItem(userId, bookId);
+        if (!existingItem) {
+            const error = new Error('Item not found in cart');
+            (error as any).status = 404;
+            throw error;
+        }
+
+        // Check if book still has enough stock
+    const book = await bookRepository.findById(bookId);
+        if (!book) {
+            const error = new Error('Book not found');
+            (error as any).status = 404;
+            throw error;
+        }
+
+        if (book.stock < quantity) {
+            const error = new Error(`Insufficient stock. Available: ${book.stock}`);
+            (error as any).status = 400;
+            throw error;
+        }
+
+        // 3. Update quantity
+        const updatedItem = await cartRepository.updateQuantity(userId, bookId, quantity);
+        return updatedItem!;
+    }
+
+    // 4. REMOVE ITEM
+    /**
+     * Remove a book from user's cart
+     * @param userId - User ID
+     * @param bookId - Book ID
+     * @returns Removed cart item
+     * @throws Error if item not found in cart
+     */
+    async removeFromCart(userId: number, bookId: number): Promise<CartItem> {
+        //  Check if item exists in cart
+        const existingItem = await cartRepository.findCartItem(userId, bookId);
+        if (!existingItem) {
+            const error = new Error('Item not found in cart');
+            (error as any).status = 404;
+            throw error;
+        }
+
+        // 2. Remove item
+        const removedItem = await cartRepository.remove(userId, bookId);
+        return removedItem!;
+    }
+
+    // 5. CLEAR CART
+    /**
+     * Clear all items from user's cart
+     * @param userId - User ID
+     * @returns Number of items removed
+     */
+    async clearCart(userId: number): Promise<{ itemsRemoved: number }> {
+        const itemsRemoved = await cartRepository.clearCart(userId);
+        return { itemsRemoved };
+    }
 }

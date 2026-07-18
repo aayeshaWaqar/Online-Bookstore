@@ -62,4 +62,35 @@ export class CartRepository {
         );
         return result.rows;
     }
+
+    // 5. REMOVE ITEM - Delete a specific book from user's cart
+    /**
+     * Remove a specific book from user's cart
+     * @param userId - User ID
+     * @param bookId - Book ID
+     * @returns Deleted cart item, or null if not found
+     */
+    async remove(userId: number, bookId: number): Promise<CartItem | null> {
+        const result = await pool.query(
+            `DELETE FROM cart 
+             WHERE user_id = $1 AND book_id = $2 
+             RETURNING *`,
+            [userId, bookId]
+        );
+        return (result.rows[0] as CartItem) || null;
+    }
+
+    // 6. CLEAR CART - Delete all items from user's cart
+    /**
+     * Remove all items from user's cart
+     * @param userId - User ID
+     * @returns Number of items deleted
+     */
+    async clearCart(userId: number): Promise<number> {
+        const result = await pool.query(
+            `DELETE FROM cart WHERE user_id = $1`,
+            [userId]
+        );
+        return result.rowCount ?? 0;
+    }
 }
