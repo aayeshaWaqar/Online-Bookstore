@@ -21,6 +21,7 @@ import bookRoutes from './routes/book.routes';
 import { errorHandler } from './middleware/error.middleware';
 import categoryRoutes from './routes/category.routes'; 
 import cartRoutes from './routes/cart.routes'; 
+import orderRoutes from './routes/order.routes';
 import './config/database';
 
 // read env file and load all variables in process.env
@@ -56,6 +57,8 @@ app.use('/api/books', bookRoutes);
 app.use('/api/categories', categoryRoutes); 
 // cartRoute
 app.use('/api/cart', cartRoutes); 
+// orderRoute
+app.use('/api/orders', orderRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -101,4 +104,5 @@ app.listen(PORT, () => {
     console.log(`Books: http://localhost:${PORT}/api/books`); 
     console.log(`Categories: http://localhost:${PORT}/api/categories`);
     console.log(`Cart: http://localhost:${PORT}/api/cart`);
+    console.log(`Orders: http://localhost:${PORT}/api/orders`);
 });

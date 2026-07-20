@@ -345,3 +345,30 @@ export const validateCartBookId = (req: Request, res: Response, next: NextFuncti
 
     next();
 };
+
+// 8. ORDER VALIDATION - PLACE ORDER
+/**
+ * Validate place order request
+ * Checks: shipping_address (required, non-empty string)
+ */
+export const validatePlaceOrder = (req: Request, res: Response, next: NextFunction): void => {
+    const { shipping_address } = req.body;
+
+    if (!shipping_address || typeof shipping_address !== 'string' || shipping_address.trim().length === 0) {
+        res.status(400).json({
+            success: false,
+            error: 'Shipping address is required'
+        });
+        return;
+    }
+
+    if (shipping_address.trim().length < 10) {
+        res.status(400).json({
+            success: false,
+            error: 'Shipping address must be at least 10 characters'
+        });
+        return;
+    }
+
+    next();
+};
